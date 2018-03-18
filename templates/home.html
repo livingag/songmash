@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>songmash</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+        <main role="main" class="inner cover" align="center">
+            <h1 class="cover-heading">Crowdsourced discography rankings.</h1>
+            <p class="lead">Vote between random tracks of an artist's discography and see which track comes out on top.</p>
+            <p>Try <a href="/voting/radiohead">Radiohead</a>, <a href="/voting/arcade%20fire">Arcade Fire</a> or <a href="/voting/bon%20iver">Bon Iver</a></p>
+        </main>
+    </div>
+</div>
+{% endblock %}

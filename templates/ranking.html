@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>songmash - {{ artist }}</title>
+<style>
+img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 150px;
+}
+.bs-docs-section {
+    margin-top: 4em;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="page-header" id="banner">
+        <div class="row">
+            <div class="col-lg-1">
+                <h1><a href='/voting/{{ artist }}' class="btn btn-outline-danger">Back</a></h1>
+            </div>
+            <div class="col-lg-10" style="text-align: center;">
+                <h1>{{ artist }}</h1>
+                <p class="lead">Current Rankings</a></p>
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+    <div class="bs-docs-section clearfix">
+        <div class="row">
+            <div class="col" align="center">
+                <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <table class="table table-hover">
+                        <thead>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Song</th>
+                            <th scope="col">Elo</th>
+                        </thead>
+                        <tbody>
+                        {% for i in range(tracks|length) %}
+                            <tr>
+                                <td>{{i+1}}.</td>
+                                <td>{{tracks[i].name}}</td>
+                                <td>{{tracks[i].elo}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript%}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% endblock %}

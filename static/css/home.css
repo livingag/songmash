@@ -1,0 +1,22 @@
+body {
+  background-color: #2C3E50;
+}
+.cover {
+padding: 0 1.5rem;
+}
+.cover .btn-lg {
+padding: .75rem 1.25rem;
+font-weight: 700;
+}
+body {
+justify-content: center;
+color: #fff;
+text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+}
+nav {
+  margin-bottom: 20rem;
+}
+
+.cover-container {
+max-width: 60em;
+}

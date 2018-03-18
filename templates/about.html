@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>songmash - {{ artist }}</title>
+<style>
+img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 150px;
+}
+.bs-docs-section {
+    margin-top: 4em;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container" style="color: white;">
+    <div style="width:100%;height:0px;position:relative;padding-bottom:41.563%;"><iframe src="https://streamable.com/s/ipvnh/snwdyo" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe></div>
+</div>
+{% endblock %}
+
+{% block javascript%}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% endblock %}
