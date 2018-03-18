@@ -13,7 +13,7 @@ app.config.update(
 
 db = SQLAlchemy(app)
 
-if not os.path.exists(basedir, 'app.db'):
+if not os.path.exists(os.path.join(basedir, 'app.db')):
     db.create_all()
 
 import views, models, utils
