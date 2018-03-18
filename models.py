@@ -11,7 +11,7 @@ class Artist(db.Model):
     albums = db.relationship('Album')
 
     def __init__(self,name):
-        name = wikipedia.search(name+' singer band')[0]
+        name = wikipedia.search(name+' music')[0]
 
         wiki = wikipedia.page(name)
         soup = BeautifulSoup(wiki.html(),"lxml")
