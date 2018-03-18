@@ -9,12 +9,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config.update(
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db'),
     SQLALCHEMY_ECHO = False,
-    SECRET_KEY = "squirrel",
-    WTF_CSRF_ENABLED = True,
-    # Disable debugging
-    DEBUG = True
 )
 
 db = SQLAlchemy(app)
+
+if not os.path.exists(basedir, 'app.db'):
+    db.create_all()
 
 import views, models, utils
