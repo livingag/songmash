@@ -1,105 +1,45 @@
 {% extends "base.html" %}
 
 {% block head %}
+<title>songmash - {{ artist }}</title>
 <style>
-a:hover img {
-    border: none !important;
-    display: block;
-}
 img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
     padding: 5px;
-    width: 200px;
+    width: 150px;
 }
 .bs-docs-section {
     margin-top: 4em;
 }
-
 </style>
 {% endblock %}
 
 {% block content %}
 
-
-<div id="content" class="container">
+<div class="container">
     <div class="page-header" id="banner">
         <div class="row">
-            <div class="col-lg-12" style="text-align: center;">
-                <h1 >{{ artist }}</h1>
-                <p class="lead"><a href="/ranking/{{ artist }}">Current Rankings</a></p>
+            <div class="col-lg-1">
+                <h1><a href='/voting/{{ artist }}' class="btn btn-outline-danger">Back</a></h1>
             </div>
+            <div class="col-lg-10" style="text-align: center;">
+                <h1>{{ artist }}</h1>
+                <p class="lead">Current Rankings</a></p>
+            </div>
+            <div class="col-lg-1"></div>
         </div>
     </div>
     <div class="bs-docs-section clearfix">
         <div class="row">
             <div class="col" align="center">
-                <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <img class="card-img-top" id=track1 src="http:{{ track1.art }}">            
-                    <div class="card-body">
-                        <p class="card-text" style="text-align: center;">{{ track1.name }}</p>                    
-                    </div>
-                    <div class="card-footer text-muted">
-                        <p class="card-text" style="text-align: center;">{{ track1.album }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col" align="center">
-                <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <img class="card-img-top" id=track2 src="http:{{ track2.art }}">            
-                    <div class="card-body">
-                        <p class="card-text" style="text-align: center;">{{ track2.name }}</p>                    
-                    </div>
-                    <div class="card-footer text-muted">
-                        <p class="card-text" style="text-align: center;">{{ track2.album }}</p>
-                    </div>
-                </div>
+                <p class="lead" style="color: white;">There is not enough data to provide an accurate ranking for this artist, keep <a href='/voting/{{ artist }}'>voting</a>!</p>
             </div>
         </div>
-    </div>
-    <div class="bs-docs-section clearfix">
-        <p style="color: white; text-align: center;">Click on album art or use left and right arrow keys to vote.</p>
-    </div>
+    </main>
 </div>
 {% endblock %}
 
 {% block javascript%}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type=text/javascript>
-    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    $(function() {
-        $('#track1').bind('click', function() {
-            $.getJSON($SCRIPT_ROOT + '/_adjust_elo', {
-                winner: {{ track1.id }},
-                loser : {{ track2.id }},
-            }, function(data) {
-                location.reload();
-            });
-        });
-        $('#track2').bind('click', function() {
-            $.getJSON($SCRIPT_ROOT + '/_adjust_elo', {
-                winner: {{ track2.id }},
-                loser : {{ track1.id }},
-            }, function(data) {
-                location.reload();
-            });
-        });
-    });
-    $(document).keyup(function(e) {
-        if (e.which == 37) {
-            $.getJSON($SCRIPT_ROOT + '/_adjust_elo', {
-                winner: {{ track1.id }},
-                loser : {{ track2.id }},
-            }, function(data) {
-                location.reload();
-            });
-        }
-        if (e.which == 39) {
-            $.getJSON($SCRIPT_ROOT + '/_adjust_elo', {
-                winner: {{ track2.id }},
-                loser : {{ track1.id }},
-            }, function(data) {
-                location.reload();
-            });
-        }
-    })
-</script>
 {% endblock %}
