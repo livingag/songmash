@@ -38,10 +38,12 @@
                 <a class="nav-link" href="/about">About</a>
             </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
-                <input class="form-control mr-sm-2" name="artist" type="text" placeholder="Artist Name...">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit" onclick="loading();">Search</button>
-            </form>
+            <div id="navSearch">
+                <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
+                    <input class="form-control mr-sm-2" name="artist" type="text" placeholder="Artist Name...">
+                    <button class="btn btn-secondary my-2 my-sm-0" type="submit" onclick="loading();">Search</button>
+                </form>
+            </div>
         </div>
         </div>
     </nav>

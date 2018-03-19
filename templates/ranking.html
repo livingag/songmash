@@ -31,8 +31,20 @@ img {
         </div>
     </div>
     <div class="bs-docs-section clearfix">
+        <div class="row" style="margin-bottom: 2vh;">
+            <div class="col-lg-10">
+                <div class="card" style=" box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <div id="placeholder" style="padding: 10px; height:20vh;"></div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <div id="legend-container" style="padding:10px;"></div>
+                </div>
+            </div>
+        </div>
         <div class="row">
-            <div class="col" align="center">
+            <div class="col-lg-6" align="center">
                 <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <table class="table table-hover">
                         <thead>
@@ -45,7 +57,27 @@ img {
                             <tr>
                                 <td>{{i+1}}.</td>
                                 <td>{{tracks[i].name}}</td>
-                                <td>{{tracks[i].elo}}</td>
+                                <td>{{'{:.0f}'.format(tracks[i].elo)}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-6" align="center">
+                <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <table class="table table-hover">
+                        <thead>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Album</th>
+                            <th scope="col">Avg Elo</th>
+                        </thead>
+                        <tbody>
+                        {% for i in range(albums|length) %}
+                            <tr>
+                                <td>{{i+1}}.</td>
+                                <td>{{albums[i].name}}</td>
+                                <td width="15%">{{'{:.0f}'.format(albums[i].mean_elo)}}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -59,4 +91,54 @@ img {
 
 {% block javascript%}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+<script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("<div id='tooltip'></div>").css({
+			position: "absolute",
+			display: "none",
+			border: "1px solid #fdd",
+			padding: "2px",
+			"background-color": "#fee",
+			opacity: 0.80
+		}).appendTo("body");
+        $.getJSON($SCRIPT_ROOT + '/_get_plot_data', {
+                artist: "{{ artist }}"
+            }, function(data) {
+                $.plot('#placeholder',data[0],{
+                    xaxis: {
+                        min: 0,
+                        ticks: []
+                    },
+                    yaxis: {
+                        title: 'Elo'
+                    },
+                    series: {
+                        lines: { show: false },
+                        points: { show: true },
+                    },
+                    legend: {
+                        container: $("#legend-container")
+                    },
+                    grid: {
+                        hoverable: true
+                    }
+                });
+                $("#placeholder").bind("plothover", function (event, pos, item){
+                    if (item) {
+                        $("#tooltip").html(data[1][item.datapoint[0]])
+                            .css({top: item.pageY-30, left: item.pageX+5, "background-color": item.series.color})
+                            .fadeIn(200);
+                    } else {
+                        $("#tooltip").hide();
+                    }
+                });
+
+            });
+        
+    })
+</script>
 {% endblock %}

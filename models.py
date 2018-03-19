@@ -11,7 +11,7 @@ class Artist(db.Model):
     albums = db.relationship('Album')
 
     def __init__(self,name):
-        name = wikipedia.search(name+' music')[0]
+        name = wikipedia.search(name+' music artist')[0]
 
         wiki = wikipedia.page(name)
         soup = BeautifulSoup(wiki.html(),"lxml")
@@ -52,7 +52,16 @@ class Album(db.Model):
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
             data.append([ele for ele in cols if ele])
-                
+
+        if not data[1:]:
+            table = soup.find('span', {'id': 'Track_listing'}).findNext('ol')
+            rows = table.find_all('li')
+            data = [[]]
+            i = 1
+            for row in rows:
+                data.append([i,row.text.strip(),i])
+                i += 1
+
         self.tracks = []
         for song in data[1:]:
             if len(song) > 2:
@@ -60,6 +69,13 @@ class Album(db.Model):
 
     def __repr__(self):
         return self.name
+    
+    def calculate_mean_elo(self):
+        if len(self.tracks) > 0:
+            tracks = [track.elo for track in self.tracks]
+            self.mean_elo = sum(tracks)/len(tracks)
+        else:
+            self.mean_elo = 0
 
 
 class Track(db.Model):
@@ -84,5 +100,5 @@ class Track(db.Model):
         R2 = 10**(opponent.elo/400)
         E1 = R1 / (R1 + R2)
         E2 = R2 / (R1 + R2)
-        self.elo += int(32 * (1 - E1))
-        opponent.elo += int(32 * (0 - E2))
+        self.elo += 32 * (1 - E1)
+        opponent.elo += 32 * (0 - E2)

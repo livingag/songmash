@@ -9,6 +9,19 @@
 <div class="container">
             <h1 class="cover-heading">Crowdsourced discography rankings.</h1>
             <p class="lead">Vote between random tracks of an artist's discography and see which track comes out on top.</p>
-            <p>Try <a href="/voting/radiohead" onclick="loading();">Radiohead</a>, <a href="/voting/arcade%20fire" onclick="loading();">Arcade Fire</a> or <a href="/voting/bon%20iver" onclick="loading();">Bon Iver</a></p>
+            <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
+                <input class="form-control mr-sm-2" name="artist" type="text" placeholder="Artist Name..." style="width: 250px;">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit" onclick="loading();">Search</button>
+            </form>
+            <p></p>
+            <p>Try <a href="/voting/radiohead" onclick="loading();">Radiohead</a>, <a href="/voting/arcade%20fire" onclick="loading();">Arcade Fire</a> or <a href="/voting/bon%20iver" onclick="loading();">Bon Iver</a></p> 
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+        $('#navSearch').hide()
+    })
+</script>
 {% endblock %}

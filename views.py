@@ -3,6 +3,7 @@ from songmash import app, db
 from utils import get_artist
 from models import *
 import random
+import json
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -43,16 +44,21 @@ def ranking(artist):
     artist = get_artist(artist)
 
     tracks = []
+    albums = []
+    
     for album in artist.albums:
+        album.calculate_mean_elo()
+        albums.append(album)
         for track in album.tracks:
-            tracks.append(track)
+            tracks.append(track)      
 
     tracks.sort(key=lambda x: x.elo, reverse=True)
+    albums.sort(key=lambda x: x.mean_elo, reverse=True)    
 
     if [track.elo for track in tracks].count(1000) > (len(tracks)/2):
         return render_template('keepvoting.html',artist=artist.name)
     else:
-        return render_template('ranking.html',artist=artist.name,tracks=tracks)
+        return render_template('ranking.html',artist=artist.name,tracks=tracks,albums=albums)
 
 @app.route('/_adjust_elo')
 def adjust_elo():
@@ -71,3 +77,26 @@ def adjust_elo():
     end = 1
 
     return jsonify(end=end)
+
+
+@app.route('/_get_plot_data')
+def get_plot_data():
+    artist = request.args.get('artist',0)
+
+    artist = get_artist(artist)
+
+    data = []
+    no = 1
+    tracknames = []
+    for album in artist.albums:
+        trackdata = []
+        for track in album.tracks:
+            trackdata.append([no,track.elo])
+            tracknames.append(track.name)
+            no+=1
+        data.append({
+            'label': album.name,
+            'data': trackdata
+        })
+    data = [data,tracknames]
+    return jsonify(data)
