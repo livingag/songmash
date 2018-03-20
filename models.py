@@ -26,7 +26,7 @@ class Artist(db.Model):
         albums = []
         releases = []
         for release in releasegroups:
-            if release['type'] == 'Album' and len(release['first-release-date']) > 4:
+            if release['type'] == 'Album' and 'disambiguation' not in release.keys():
                 releases.append(release)
         releases.sort(key=lambda x: x['first-release-date'])
         albumids = [release['id'] for release in releases]
