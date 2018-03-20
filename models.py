@@ -50,10 +50,11 @@ class Artist(db.Model):
                 if 'format' in album['medium-list'][0].keys() and \
                    album['cover-art-archive']['artwork'] == 'true':
                     if album['medium-list'][0]['format'] == 'Digital Media':
+                        albums.append(album)
                         break
                     elif album['medium-list'][0]['format'] == 'CD':
+                        albums.append(album)
                         break
-            albums.append(album)
 
         self.albums = [Album(album,self.name) for album in albums]
 
