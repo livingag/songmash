@@ -12,7 +12,7 @@ img {
     width: 200px;
 }
 .bs-docs-section {
-    margin-top: 4vh;
+    margin-top: 2vh;
 }
 
 </style>
@@ -27,12 +27,13 @@ img {
             <div class="col-lg-12" style="text-align: center;">
                 <h1 >{{ artist.name }}</h1>
                 <p class="lead"><a href="/ranking/{{ artist.artistid }}">Current Rankings</a></p>
+                
             </div>
         </div>
     </div>
     <div class="bs-docs-section clearfix">
         <div class="row">
-            <div class="col" align="center">
+            <div id="trackcol" class="col" align="center">
                 <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <img class="card-img-top" id=track1 src="{{ track1.album.art }}">
                     <div class="card-body">
@@ -56,8 +57,9 @@ img {
             </div>
         </div>
     </div>
-    <div class="bs-docs-section clearfix">
-        <p style="color: white; text-align: center;">Click on album art or use left and right arrow keys to vote.</p>
+    <div class="bs-docs-section clearfix" align="center">
+            <p style="color: white; text-align: center;">Click on album art or use left and right arrow keys to vote.</p>
+        <p><button class="btn btn-secondary" onclick="location.reload();">Skip matchup</button></p>
     </div>
 </div>
 {% endblock %}
