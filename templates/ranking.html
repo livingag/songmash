@@ -92,6 +92,7 @@ img {
 {% block javascript%}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.resize.min.js"></script>
 <script type=text/javascript>
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 </script>
@@ -108,7 +109,8 @@ img {
         $.getJSON($SCRIPT_ROOT + '/_get_plot_data', {
                 artist: "{{ artist.artistid }}"
             }, function(data) {
-                $.plot('#placeholder',data[0],{
+		var placeholder = $('#placeholder');
+                var plot = $.plot('#placeholder',data[0],{
                     xaxis: {
                         min: 0,
                         ticks: []
@@ -127,6 +129,7 @@ img {
                         hoverable: true
                     }
                 });
+		$('#placeholder').height($('#legend-container').outerHeight());
                 $("#placeholder").bind("plothover", function (event, pos, item){
                     if (item) {
                         $("#tooltip").html(data[1][item.datapoint[0]-1])
