@@ -3,6 +3,7 @@ from songmash import app, db
 from utils import get_artist
 from models import *
 import random
+from profanity import profanity
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -35,10 +36,11 @@ def search():
 def new_artist(artist):
     out = []
     for artist in musicbrainzngs.search_artists(artist)['artist-list']:
-        if 'disambiguation' in artist.keys():
-            out.append([artist['name']+' ('+artist['disambiguation']+')',artist['id']])
-        else:
-            out.append([artist['name'],artist['id']])
+        if not profanity.contains_profanity(artist['name']):
+            if 'disambiguation' in artist.keys():
+                out.append([artist['name']+' ('+artist['disambiguation']+')',artist['id']])
+            else:
+                out.append([artist['name'],artist['id']])
 
     return render_template('newartist.html', list=out[:10])
 
