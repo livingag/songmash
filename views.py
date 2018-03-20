@@ -7,7 +7,10 @@ import random
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    artlist = random.sample(Artist.query.all(),3)
+    if len(Artist.query.all()) > 2:
+        artlist = random.sample(Artist.query.all(),3)
+    else:
+        artlist = None
     return render_template('home.html',artlist=artlist)
 
 
