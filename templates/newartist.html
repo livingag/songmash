@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>songmash - {{ artist }}</title>
+<style>
+.bs-docs-section {
+    margin-top: 4em;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="page-header" id="banner">
+        <div class="row">
+            <div class="col-lg-10" style="text-align: center;">
+                <p class="lead">Please select relevant artist:</a></p>
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+    <div class="bs-docs-section clearfix">
+        <ul style="list-style-type: none;">
+            {% for artist in list %}
+                <li><a href="/voting/{{ artist[1] }}" onclick="loading();">{{artist[0]}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript%}
+{% endblock %}

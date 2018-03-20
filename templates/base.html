@@ -52,7 +52,7 @@
             <div class="container" align="center" style="color: white;">
                 <p><img src="{{ url_for('static', filename='img/duck.gif') }}" style="width: 200px"></p>
                 <p>Loading new artist discography...</p>
-                <p>(This may take a while)</p>
+                <p>(This may take a while for artists with large discographies)</p>
             </div>
         </div>
         <div id="content">
@@ -67,7 +67,7 @@
                 setTimeout(function() {
                     $("#loading").show();
                     $("#content").hide();  
-                }, 1000);  
+                }, 1500);  
             }
         // ]]></script>
         <script>

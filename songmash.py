@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+import musicbrainzngs
 
 app = Flask(__name__)
 
@@ -13,8 +14,9 @@ app.config.update(
 
 db = SQLAlchemy(app)
 
+musicbrainzngs.set_useragent("songmash","0.1","http://songmash.me")
+
 import views, models, utils
 
 if not os.path.exists(os.path.join(basedir, 'app.db')):
     db.create_all()
-    

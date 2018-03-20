@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>songmash - {{ artist }}</title>
+<title>songmash - {{ artist.name }}</title>
 <style>
 img {
     border: 1px solid #ddd;
@@ -21,10 +21,10 @@ img {
     <div class="page-header" id="banner">
         <div class="row">
             <div class="col-lg-1">
-                <h1><a href='/voting/{{ artist }}' class="btn btn-outline-danger">Back</a></h1>
+                <h1><a href='/voting/{{ artist.artistid }}' class="btn btn-outline-danger">Back</a></h1>
             </div>
             <div class="col-lg-10" style="text-align: center;">
-                <h1>{{ artist }}</h1>
+                <h1>{{ artist.name }}</h1>
                 <p class="lead">Current Rankings</a></p>
             </div>
             <div class="col-lg-1"></div>
@@ -106,7 +106,7 @@ img {
 			opacity: 0.80
 		}).appendTo("body");
         $.getJSON($SCRIPT_ROOT + '/_get_plot_data', {
-                artist: "{{ artist }}"
+                artist: "{{ artist.artistid }}"
             }, function(data) {
                 $.plot('#placeholder',data[0],{
                     xaxis: {

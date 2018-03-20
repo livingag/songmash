@@ -1,29 +1,61 @@
 from songmash import app, db
 from bs4 import BeautifulSoup
 import requests
-import wikipedia
+import musicbrainzngs
 
 
 class Artist(db.Model):
     __tablename__ = 'artists'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(40))
+    artistid = db.Column(db.String(40))
     albums = db.relationship('Album')
 
-    def __init__(self,name):
-        name = wikipedia.search(name+' music artist')[0]
+    def __init__(self,artistid):
+        artist = musicbrainzngs.get_artist_by_id(
+            artistid,
+            includes=["release-groups"],
+            release_type=["album"]
+        )['artist']
 
-        wiki = wikipedia.page(name)
-        soup = BeautifulSoup(wiki.html(),"lxml")
-        
-        discog = soup.find('span', {'id': 'Discography'}).findNext('ul')
-        
-        self.albums = [Album(self.name,al.contents[0],al['title']) for al in discog.find_all('a')]
-        
-        for title in ['band','singer','musician']:
-            name = name.replace(' ({})'.format(title),'')
-        
-        self.name = name
+        self.name = artist['name']
+        self.artistid = artistid
+
+        releasegroups = artist['release-group-list']
+
+        albums = []
+        releases = []
+        for release in releasegroups:
+            if release['type'] == 'Album' and len(release['first-release-date']) > 4:
+                releases.append(release)
+        releases.sort(key=lambda x: x['first-release-date'])
+        albumids = [release['id'] for release in releases]
+
+        for albumid in albumids:
+
+            releases = musicbrainzngs.get_release_group_by_id(albumid,includes=["releases"])['release-group']['release-list']
+
+            us = []
+            for rel in releases:
+                if 'disambiguation' not in rel.keys() and \
+                   all(k in rel.keys() for k in ['country','date','status']) and \
+                   rel['status'] == 'Official':
+                    if rel['country'] in ['US','GB','XW','XE']:
+                        us.append(rel)
+
+            us.sort(key=lambda x: x['date'])
+
+            for rel in us:
+                album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings'])['release']
+                if 'format' in album['medium-list'][0].keys() and \
+                   album['cover-art-archive']['artwork'] == 'true':
+                    if album['medium-list'][0]['format'] == 'Digital Media':
+                        break
+                    elif album['medium-list'][0]['format'] == 'CD':
+                        break
+            albums.append(album)
+
+        self.albums = [Album(album,self.name) for album in albums]
 
 
 class Album(db.Model):
@@ -33,43 +65,27 @@ class Album(db.Model):
     name = db.Column(db.String(40))
     title = db.Column(db.String(40))
     art = db.Column(db.String(200))
-    tracks = db.relationship('Track')
+    tracks = db.relationship('Track', backref='album', lazy=True)
 
-    def __init__(self,artist,name,title):
+    def __init__(self,album,artist):
         self.artist = artist
-        self.name = name
-        self.title = title
-
-        wiki = wikipedia.page(self.title)
-        soup = BeautifulSoup(wiki.html(), "lxml")
-        
-        self.art = soup.find('table',{'class':'infobox'}).findNext('img')['src']
-        
-        table = soup.find('span', {'id': 'Track_listing'}).findNext('table')
-        rows = table.find_all('tr')
-        data = []
-        for row in rows:
-            cols = row.find_all('td')
-            cols = [ele.text.strip() for ele in cols]
-            data.append([ele for ele in cols if ele])
-
-        if not data[1:]:
-            table = soup.find('span', {'id': 'Track_listing'}).findNext('ol')
-            rows = table.find_all('li')
-            data = [[]]
-            i = 1
-            for row in rows:
-                data.append([i,row.text.strip(),i])
-                i += 1
-
+        self.name = album['title']
+        self.get_album_art(album)
         self.tracks = []
-        for song in data[1:]:
-            if len(song) > 2:
-                self.tracks.append(Track(song[1].split(song[1][0])[1],self.artist,self.name,self.art))
+        for track in album['medium-list'][0]['track-list']:
+            self.tracks.append(Track(track['recording']['title'],
+                                     self.artist))
 
     def __repr__(self):
         return self.name
-    
+
+    def get_album_art(self,album):
+        art = requests.get('http://coverartarchive.org/release/{}'.format(album['id']))
+        if art.status_code == 502:
+            time.sleep(0.5)
+            art = requests.get('http://coverartarchive.org/release/{}'.format(album['id']))
+        self.art = art.json()['images'][0]['thumbnails']['small']
+
     def calculate_mean_elo(self):
         if len(self.tracks) > 0:
             tracks = [track.elo for track in self.tracks]
@@ -83,15 +99,11 @@ class Track(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(40))
     albumid = db.Column(db.Integer(), db.ForeignKey('albums.id'))
-    album = db.Column(db.String(40))
-    art = db.Column(db.String(200))
     elo = db.Column(db.Integer())
 
-    def __init__(self,name,artist,album,art):
+    def __init__(self,name,artist):
         self.name = name
         self.artist = artist
-        self.album = album
-        self.art = art
         self.elo = 1000
     def __repr__(self):
         return self.name

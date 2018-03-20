@@ -3,6 +3,12 @@
 {% block head %}
 <title>songmash</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+<style>
+a:hover img {
+border: none !important;
+display: block;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +20,7 @@
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit" onclick="loading();">Search</button>
             </form>
             <p></p>
-            <p>Try <a href="/voting/radiohead" onclick="loading();">Radiohead</a>, <a href="/voting/arcade%20fire" onclick="loading();">Arcade Fire</a> or <a href="/voting/bon%20iver" onclick="loading();">Bon Iver</a></p> 
+            <p>Try <a href="/voting/{{artlist[0].artistid}}" onclick="loading();">{{artlist[0].name}}</a>, <a href="/voting/{{artlist[1].artistid}}" onclick="loading();">{{artlist[1].name}}</a> or <a href="/voting/{{artlist[2].artistid}}" onclick="loading();">{{artlist[2].name}}</a></p> 
 </div>
 {% endblock %}
 

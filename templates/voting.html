@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>songmash - {{ artist }}</title>
+<title>songmash - {{ artist.name }}</title>
 <style>
 a:hover img {
     border: none !important;
@@ -25,8 +25,8 @@ img {
     <div class="page-header" id="banner">
         <div class="row">
             <div class="col-lg-12" style="text-align: center;">
-                <h1 >{{ artist }}</h1>
-                <p class="lead"><a href="/ranking/{{ artist }}">Current Rankings</a></p>
+                <h1 >{{ artist.name }}</h1>
+                <p class="lead"><a href="/ranking/{{ artist.artistid }}">Current Rankings</a></p>
             </div>
         </div>
     </div>
@@ -34,9 +34,9 @@ img {
         <div class="row">
             <div class="col" align="center">
                 <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <img class="card-img-top" id=track1 src="http:{{ track1.art }}">            
+                    <img class="card-img-top" id=track1 src="{{ track1.album.art }}">
                     <div class="card-body">
-                        <p class="card-text" style="text-align: center;">{{ track1.name }}</p>                    
+                        <p class="card-text" style="text-align: center;">{{ track1.name }}</p>
                     </div>
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track1.album }}</p>
@@ -45,9 +45,9 @@ img {
             </div>
             <div class="col" align="center">
                 <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <img class="card-img-top" id=track2 src="http:{{ track2.art }}">            
+                    <img class="card-img-top" id=track2 src="{{ track2.album.art }}">
                     <div class="card-body">
-                        <p class="card-text" style="text-align: center;">{{ track2.name }}</p>                    
+                        <p class="card-text" style="text-align: center;">{{ track2.name }}</p>
                     </div>
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track2.album }}</p>

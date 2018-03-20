@@ -1,15 +1,13 @@
 from songmash import app, db
 from models import Artist
 from bs4 import BeautifulSoup
-import requests
-import wikipedia
 
-def get_artist(name):
+def get_artist(artistid):
 
-    if Artist.query.filter(Artist.name.ilike(name)).first():
-        return Artist.query.filter(Artist.name.ilike(name)).first()
+    if Artist.query.filter_by(artistid=artistid).first():
+        return Artist.query.filter_by(artistid=artistid).first()
     else:
-        artist = Artist(name)
+        artist = Artist(artistid)
         db.session.add(artist)
         db.session.commit()
         return artist

@@ -3,13 +3,12 @@ from songmash import app, db
 from utils import get_artist
 from models import *
 import random
-import json
 
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-
-    return render_template('home.html')
+    artlist = random.sample(Artist.query.all(),3)
+    return render_template('home.html',artlist=artlist)
 
 
 @app.route('/about')
@@ -21,53 +20,70 @@ def about():
 @app.route('/search', methods=['POST'])
 def search():
     if request.method == 'POST':
-        return redirect(url_for('voting',artist=request.form['artist']))
+        name = request.form['artist']
+        if Artist.query.filter(Artist.name.ilike(name)).first():
+            artist = Artist.query.filter(Artist.name.ilike(name)).first()
+            return redirect(url_for('voting',artistid=artist.artistid))
+        else:
+            return redirect(url_for('new_artist',artist=request.form['artist']))
 
 
-@app.route('/voting/<string:artist>')
-def voting(artist):
+@app.route('/newartist/<string:artist>')
+def new_artist(artist):
+    out = []
+    for artist in musicbrainzngs.search_artists(artist)['artist-list']:
+        if 'disambiguation' in artist.keys():
+            out.append([artist['name']+' ('+artist['disambiguation']+')',artist['id']])
+        else:
+            out.append([artist['name'],artist['id']])
 
-    artist = get_artist(artist)
+    return render_template('newartist.html', list=out[:10])
+
+
+@app.route('/voting/<string:artistid>')
+def voting(artistid):
+
+    artist = get_artist(artistid)
 
     tracks = []
     for album in artist.albums:
         for track in album.tracks:
             tracks.append(track)
-    
+
     vs = random.sample(tracks,2)
 
-    return render_template('voting.html',artist=artist.name,track1=vs[0],track2=vs[1])
+    return render_template('voting.html',artist=artist,track1=vs[0],track2=vs[1])
 
-@app.route('/ranking/<string:artist>')
-def ranking(artist):
+@app.route('/ranking/<string:artistid>')
+def ranking(artistid):
 
-    artist = get_artist(artist)
+    artist = get_artist(artistid)
 
     tracks = []
     albums = []
-    
+
     for album in artist.albums:
         album.calculate_mean_elo()
         albums.append(album)
         for track in album.tracks:
-            tracks.append(track)      
+            tracks.append(track)
 
     tracks.sort(key=lambda x: x.elo, reverse=True)
-    albums.sort(key=lambda x: x.mean_elo, reverse=True)    
+    albums.sort(key=lambda x: x.mean_elo, reverse=True)
 
     if [track.elo for track in tracks].count(1000) > (len(tracks)/2):
         return render_template('keepvoting.html',artist=artist.name)
     else:
-        return render_template('ranking.html',artist=artist.name,tracks=tracks,albums=albums)
+        return render_template('ranking.html',artist=artist,tracks=tracks,albums=albums)
 
 @app.route('/_adjust_elo')
 def adjust_elo():
     winner = request.args.get('winner', 0, type=int)
     loser = request.args.get('loser', 0, type=int)
-    
+
     winner = Track.query.filter_by(id=winner).first()
     loser = Track.query.filter_by(id=loser).first()
-    
+
     winner.adjust_elo_win(loser)
 
     db.session.add(winner)
