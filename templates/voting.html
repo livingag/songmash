@@ -58,7 +58,7 @@ img {
         </div>
     </div>
     <div class="bs-docs-section clearfix" align="center">
-            <p style="color: white; text-align: center;">Click on album art or use left and right arrow keys to vote.</p>
+            <p style="color: white; text-align: center;">Click on album art or use left and right arrow keys to vote. Down arrow to skip.</p>
         <p><button class="btn btn-secondary" onclick="location.reload();">Skip matchup</button></p>
     </div>
 </div>
@@ -102,6 +102,9 @@ img {
             }, function(data) {
                 location.reload();
             });
+        }
+        if (e.which == 40) {
+            location.reload();
         }
     })
 </script>
