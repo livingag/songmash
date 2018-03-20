@@ -31,6 +31,9 @@ class Artist(db.Model):
         releases.sort(key=lambda x: x['first-release-date'])
         albumids = [release['id'] for release in releases]
 
+        if len(albumids) <= 1:
+            raise ValueError()
+
         for albumid in albumids:
 
             releases = musicbrainzngs.get_release_group_by_id(albumid,includes=["releases"])['release-group']['release-list']
