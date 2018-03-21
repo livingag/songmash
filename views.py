@@ -77,7 +77,7 @@ def ranking(artistid):
     albums.sort(key=lambda x: x.mean_elo, reverse=True)
 
     if [track.elo for track in tracks].count(1000) > (len(tracks)/2):
-        return render_template('keepvoting.html',artist=artist.name)
+        return render_template('keepvoting.html',artist=artist)
     else:
         return render_template('ranking.html',artist=artist,tracks=tracks,albums=albums)
 

@@ -24,7 +24,7 @@ img {
                 <h1><a href='/voting/{{ artist.artistid }}' class="btn btn-outline-danger">Back</a></h1>
             </div>
             <div class="col-lg-10" style="text-align: center;">
-                <h1>{{ artist }}</h1>
+                <h1>{{ artist.name }}</h1>
                 <p class="lead">Current Rankings</a></p>
             </div>
             <div class="col-lg-1"></div>
@@ -33,7 +33,7 @@ img {
     <div class="bs-docs-section clearfix">
         <div class="row">
             <div class="col" align="center">
-                <p class="lead" style="color: white;">There is not enough data to provide an accurate ranking for this artist, keep <a href='/voting/{{ artist }}'>voting</a>!</p>
+                <p class="lead" style="color: white;">There is not enough data to provide an accurate ranking for this artist, keep <a href='/voting/{{ artist.artistid }}'>voting</a>!</p>
             </div>
         </div>
     </main>
