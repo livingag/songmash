@@ -2,6 +2,7 @@ from songmash import app, db
 from bs4 import BeautifulSoup
 import requests
 import musicbrainzngs
+from bs4 import BeautifulSoup
 
 
 class Artist(db.Model):
@@ -48,6 +49,7 @@ class Artist(db.Model):
 
             us.sort(key=lambda x: x['date'])
 
+            nalbums = len(albums)
             for rel in us:
                 album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings'])['release']
                 if 'format' in album['medium-list'][0].keys() and \
@@ -58,6 +60,17 @@ class Artist(db.Model):
                     elif album['medium-list'][0]['format'] == 'CD':
                         albums.append(album)
                         break
+            
+            if len(albums) == nalbums:
+                for rel in us:
+                    album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings'])['release']
+                    if 'format' in album['medium-list'][0].keys():
+                        if album['medium-list'][0]['format'] == 'Digital Media':
+                            albums.append(album)
+                            break
+                        elif album['medium-list'][0]['format'] == 'CD':
+                            albums.append(album)
+                            break
 
         self.albums = [Album(album,self.name) for album in albums]
 
@@ -85,10 +98,19 @@ class Album(db.Model):
 
     def get_album_art(self,album):
         art = requests.get('http://coverartarchive.org/release/{}'.format(album['id']))
-        if art.status_code == 502:
+        if art.status_code == 404:
+            try:
+                asin = album['asin']
+                r = requests.get('http://www.amazon.com/gp/product/{}'.format(asin))
+                soup = BeautifulSoup(r.text,"lxml")
+                self.art = soup.find('img', {'alt': album['title']})['src']
+            except:
+                self.art = "{{ url_for('static', filename='img/noart.png') }}"
+        elif art.status_code == 502:
             time.sleep(0.5)
             art = requests.get('http://coverartarchive.org/release/{}'.format(album['id']))
-        self.art = art.json()['images'][0]['thumbnails']['small']
+        elif:
+            self.art = art.json()['images'][0]['thumbnails']['small']
 
     def calculate_mean_elo(self):
         if len(self.tracks) > 0:
