@@ -130,17 +130,17 @@ img {
                     }
                 });
 		$('#placeholder').height($('#legend-container').outerHeight());
-                $("#placeholder").bind("plothover", function (event, pos, item){
-                    if (item) {
-                        $("#tooltip").html(data[1][item.datapoint[0]-1])
-                            .css({top: item.pageY-30, left: item.pageX+5, "background-color": item.series.color})
-                            .fadeIn(200);
-                    } else {
-                        $("#tooltip").hide();
-                    }
-                });
+        $("#placeholder").bind("plothover", function (event, pos, item){
+            if (item) {
+                $("#tooltip").html(data[1][item.datapoint[0]-1])
+                    .css({top: item.pageY-30, left: item.pageX+5, "background-color": item.series.color})
+                    .fadeIn(200);
+            } else {
+                $("#tooltip").hide();
+            }
+        });
 
-            });
+    });
         
     })
 </script>
