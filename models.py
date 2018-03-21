@@ -109,7 +109,7 @@ class Album(db.Model):
         elif art.status_code == 502:
             time.sleep(0.5)
             art = requests.get('http://coverartarchive.org/release/{}'.format(album['id']))
-        elif:
+        else:
             self.art = art.json()['images'][0]['thumbnails']['small']
 
     def calculate_mean_elo(self):
