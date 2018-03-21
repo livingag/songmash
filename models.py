@@ -27,7 +27,8 @@ class Artist(db.Model):
         albums = []
         releases = []
         for release in releasegroups:
-            if release['type'] == 'Album' and 'disambiguation' not in release.keys():
+            if release['type'] == 'Album' and \
+               all(k not in release.keys() for k in ['disambiguation','secondary-type-list']):
                 releases.append(release)
         releases.sort(key=lambda x: x['first-release-date'])
         albumids = [release['id'] for release in releases]
