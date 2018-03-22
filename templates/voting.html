@@ -24,11 +24,25 @@ img {
 <div id="content" class="container">
     <div class="page-header" id="banner">
         <div class="row">
-            <div class="col-lg-12" style="text-align: center;">
-                <h1 >{{ artist.name }}</h1>
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8" style="text-align: center;">
+                <h1>{{ artist.name }}</h1>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div style="display: inline-block;" class="mx-auto alert alert-dismissible alert-{{category}}">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
                 <p class="lead"><a href="/ranking/{{ artist.artistid }}">Current Rankings</a></p>
-                
             </div>
+            <div class="col-lg-1">
+                <h1><a href='/update/{{ artist.artistid }}' class="btn btn-outline-info" onclick="loading();">Update Artist</a></h1>
+            </div>
+            <div class="col-lg-1"></div>
         </div>
     </div>
     <div class="bs-docs-section clearfix">

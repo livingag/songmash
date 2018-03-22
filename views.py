@@ -1,4 +1,4 @@
-from flask import render_template, request, url_for,jsonify, redirect
+from flask import render_template, request, url_for,jsonify, redirect, flash
 from songmash import app, db
 from utils import get_artist
 from models import *
@@ -81,6 +81,39 @@ def ranking(artistid):
     else:
         return render_template('ranking.html',artist=artist,tracks=tracks,albums=albums)
 
+
+@app.route('/update/<string:artistid>')
+def update_artist(artistid):
+
+    newartist = Artist(artistid)
+    oldartist = Artist.query.filter_by(artistid=artistid).first()
+
+    oldalbums = [a.name for a in oldartist.albums]
+    newalbums = []
+    for album in newartist.albums:
+        if album.name not in oldalbums:
+            newalbums.append(album)
+        else:
+            ind = oldalbums.index(album.name)
+            oldalbum = oldartist.albums[ind]
+            oldtracks = [t.name for t in oldalbum.tracks]
+            newtracks = []
+            for track in album.tracks:
+                if track.name not in oldtracks:
+                    newtracks.append(track)
+            oldalbum.tracks.extend(newtracks)   
+    oldartist.albums.extend(newalbums)
+
+    db.session.commit()
+
+    if len(newalbums) > 0 or len(newtracks) > 0:
+        flash('Artist successfully updated!','success')
+    else:
+        flash('Artist already up to date!','info')
+    
+    return redirect(url_for('voting',artistid=oldartist.artistid))
+
+
 @app.route('/_adjust_elo')
 def adjust_elo():
     winner = request.args.get('winner', 0, type=int)
@@ -121,3 +154,5 @@ def get_plot_data():
         })
     data = [data,tracknames]
     return jsonify(data)
+
+
