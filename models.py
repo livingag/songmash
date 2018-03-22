@@ -90,8 +90,9 @@ class Album(db.Model):
         self.name = album['title']
         self.get_album_art(album)
         self.tracks = []
-        for track in album['medium-list'][0]['track-list']:
-            self.tracks.append(Track(track['recording']['title'],
+        for disc in album['medium-list']:
+            for track in disc['track-list']:
+                self.tracks.append(Track(track['recording']['title'],
                                      self.artist))
 
     def __repr__(self):
