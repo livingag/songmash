@@ -10,6 +10,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config.update(
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db'),
     SQLALCHEMY_ECHO = False,
+    SECRET_KEY = '40c2dc59fc221f675231bcd9e2374e29bcbf0edc1704c2f0'
 )
 
 db = SQLAlchemy(app)
