@@ -78,7 +78,8 @@ def voting(artistid):
             track = ' '.join(v.name.lower().split()[::3])
             album = v.album.name.lower()
             result = sp.search(q='{} {} {}'.format(artist.name, track, album))
-            v.spid = result['tracks']['items'][0]['id']
+            if len(result['tracks']['items']) > 0:
+                v.spid = result['tracks']['items'][0]['id']
 
     return render_template('voting.html',artist=artist,track1=vs[0],track2=vs[1])
 

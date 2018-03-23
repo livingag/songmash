@@ -58,7 +58,7 @@ img {
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track1.album }}</p>
                     </div>
-                    {% if 'spotify-token' in session %}
+                    {% if 'spotify-token' in session and track1.spid %}
                     <div class="card-footer">
                         <iframe src="https://open.spotify.com/embed?uri=spotify:track:{{ track1.spid }}" width="250" height="80" frameborder="0" allow="encrypted-media" allowtransparency="true"></iframe>
                     </div>
@@ -74,7 +74,7 @@ img {
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track2.album }}</p>
                     </div>
-                    {% if 'spotify-token' in session %}
+                    {% if 'spotify-token' in session  and track2.spid %}
                     <div class="card-footer">
                         <iframe src="https://open.spotify.com/embed?uri=spotify:track:{{ track2.spid }}" width="250" height="80" frameborder="0" allow="encrypted-media" allowtransparency="true"></iframe>
                     </div>
