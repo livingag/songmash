@@ -14,7 +14,9 @@ img {
 .bs-docs-section {
     margin-top: 2vh;
 }
-
+.animated {
+    animation-duration: 1.5s;
+}
 </style>
 {% endblock %}
 
@@ -46,9 +48,9 @@ img {
         </div>
     </div>
     <div class="bs-docs-section clearfix">
-        <div class="row">
-            <div id="trackcol" class="col" align="center">
-                <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+        <div class="row" style="min-height: 450px;">
+            <div id="trackcol" class="col animated fadeInLeftBig" align="center">
+                <div id="track1card" class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <a href="#"><img class="card-img-top" id=track1 src="{{ track1.album.art }}"></a>
                     <div class="card-body">
                         <p class="card-text" style="text-align: center;">{{ track1.name }}</p>
@@ -58,8 +60,8 @@ img {
                     </div>
                 </div>
             </div>
-            <div class="col" align="center">
-                <div class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+            <div class="col animated fadeInRightBig pulse" align="center">
+                <div id="track2card" class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <a href="#"><img class="card-img-top" id=track2 src="{{ track2.album.art }}"></a>
                     <div class="card-body">
                         <p class="card-text" style="text-align: center;">{{ track2.name }}</p>
@@ -81,6 +83,34 @@ img {
 {% block javascript%}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type=text/javascript>
+    $.fn.extend({
+    animateCss: function(animationName, callback) {
+        var animationEnd = (function(el) {
+        var animations = {
+            animation: 'animationend',
+            OAnimation: 'oAnimationEnd',
+            MozAnimation: 'mozAnimationEnd',
+            WebkitAnimation: 'webkitAnimationEnd',
+        };
+
+        for (var t in animations) {
+            if (el.style[t] !== undefined) {
+            return animations[t];
+            }
+        }
+        })(document.createElement('div'));
+
+        this.addClass('animated ' + animationName).one(animationEnd, function() {
+        $(this).removeClass('animated ' + animationName);
+
+        if (typeof callback === 'function') callback();
+        });
+
+        return this;
+    },
+    });
+</script>
+<script type=text/javascript>
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     $(function() {
         $('#track1').bind('click', function() {
@@ -88,7 +118,10 @@ img {
                 winner: {{ track1.id }},
                 loser : {{ track2.id }},
             }, function(data) {
-                location.reload();
+                $('#track2card').addClass('animated fadeOutRight');
+                $('#track1card').animateCss('pulse', function () {
+                    location.reload();
+                });
             });
         });
         $('#track2').bind('click', function() {
@@ -96,7 +129,10 @@ img {
                 winner: {{ track2.id }},
                 loser : {{ track1.id }},
             }, function(data) {
-                location.reload();
+                $('#track1card').addClass('animated fadeOutLeft');
+                $('#track2card').animateCss('pulse', function () {
+                    location.reload();
+                });
             });
         });
     });
