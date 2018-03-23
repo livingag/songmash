@@ -39,6 +39,15 @@
                 <a class="nav-link" href="/about">About</a>
             </li>
             </ul>
+            {% if 'spotify-token' not in session %}
+                <div>
+                    <a href="{{ url_for("login_spotify") }}" class="btn btn-primary mr-sm-2" style="background-color: #1db954;">Connect with Spotify</a>
+                </div>
+            {% else %}
+                <div>
+                    <a href="{{ url_for("logout_spotify") }}" class="btn btn-primary mr-sm-2" style="background-color: #1db954;">Disconnect Spotify</a>
+                </div>
+            {% endif %}
             <div id="navSearch">
                 <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
                     <input class="form-control mr-sm-2" name="artist" type="text" placeholder="Artist Name...">

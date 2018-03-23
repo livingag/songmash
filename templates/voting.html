@@ -48,7 +48,7 @@ img {
         </div>
     </div>
     <div class="bs-docs-section clearfix">
-        <div class="row" style="min-height: 450px;">
+        <div class="row" style="min-height: 530px;">
             <div id="trackcol" class="col animated fadeInLeftBig" align="center">
                 <div id="track1card" class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <a href="#"><img class="card-img-top" id=track1 src="{{ track1.album.art }}"></a>
@@ -58,6 +58,11 @@ img {
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track1.album }}</p>
                     </div>
+                    {% if 'spotify-token' in session %}
+                    <div class="card-footer">
+                        <iframe src="https://open.spotify.com/embed?uri=spotify:track:{{ track1.spid }}" width="250" height="80" frameborder="0" allow="encrypted-media" allowtransparency="true"></iframe>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col animated fadeInRightBig pulse" align="center">
@@ -69,6 +74,11 @@ img {
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track2.album }}</p>
                     </div>
+                    {% if 'spotify-token' in session %}
+                    <div class="card-footer">
+                        <iframe src="https://open.spotify.com/embed?uri=spotify:track:{{ track2.spid }}" width="250" height="80" frameborder="0" allow="encrypted-media" allowtransparency="true"></iframe>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

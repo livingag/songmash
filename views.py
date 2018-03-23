@@ -1,18 +1,28 @@
-from flask import render_template, request, url_for,jsonify, redirect, flash
+from flask import render_template, request, url_for,jsonify, redirect, flash, session
 from songmash import app, db
 from utils import get_artist
 from models import *
 import random
 from profanity import profanity
+import urllib
+import spotipy
+from spotipy import oauth2
+import base64
+import json
+import six
+
 
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    if len(Artist.query.all()) > 2:
-        artlist = random.sample(Artist.query.all(),3)
+    if 'spotify-token' in session:        
+        token = session['spotify-token']
+        sp = spotipy.Spotify(auth=token)
+        topartists = sp.current_user_top_artists(time_range='long_term', limit=10)
+
+        return render_template('home.html',artlist=topartists['items'])
     else:
-        artlist = None
-    return render_template('home.html',artlist=artlist)
+        return render_template('home.html')
 
 
 @app.route('/about')
@@ -21,15 +31,18 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['GET','POST'])
 def search():
     if request.method == 'POST':
         name = request.form['artist']
-        if Artist.query.filter(Artist.name.ilike(name)).first():
-            artist = Artist.query.filter(Artist.name.ilike(name)).first()
-            return redirect(url_for('voting',artistid=artist.artistid))
-        else:
-            return redirect(url_for('new_artist',artist=request.form['artist']))
+    else:
+        name = request.args.get('artist')
+    
+    if Artist.query.filter(Artist.name.ilike(name)).first():
+        artist = Artist.query.filter(Artist.name.ilike(name)).first()
+        return redirect(url_for('voting',artistid=artist.artistid))
+    else:
+        return redirect(url_for('new_artist',artist=name))
 
 
 @app.route('/newartist/<string:artist>')
@@ -48,6 +61,7 @@ def new_artist(artist):
 @app.route('/voting/<string:artistid>')
 def voting(artistid):
 
+    
     artist = get_artist(artistid)
 
     tracks = []
@@ -56,6 +70,15 @@ def voting(artistid):
             tracks.append(track)
 
     vs = random.sample(tracks,2)
+
+    if 'spotify-token' in session: 
+        token = session['spotify-token']
+        sp = spotipy.Spotify(auth=token)
+        for v in vs:
+            track = ' '.join(v.name.lower().split()[::3])
+            album = v.album.name.lower()
+            result = sp.search(q='{} {} {}'.format(artist.name, track, album))
+            v.spid = result['tracks']['items'][0]['id']
 
     return render_template('voting.html',artist=artist,track1=vs[0],track2=vs[1])
 
@@ -113,6 +136,46 @@ def update_artist(artistid):
     
     return redirect(url_for('voting',artistid=oldartist.artistid))
 
+
+@app.route('/login-spotify')
+def login_spotify():
+
+    auth_query_parameters = {
+        "response_type": "code",
+        "redirect_uri": app.config['REDIRECT_URI']+url_for('auth'),
+        "scope": "user-top-read",
+        "client_id": app.config['CLIENT_ID']
+    }
+
+    url_args = "&".join(["{}={}".format(key,urllib.parse.quote(val)) for key,val in auth_query_parameters.items()])
+    auth_url = "{}/?{}".format("https://accounts.spotify.com/authorize", url_args)
+    return redirect(auth_url)
+
+@app.route('/logout-spotify')
+def logout_spotify():
+
+    session.pop('spotify-token', None)
+    return redirect(url_for('home'))
+
+@app.route('/auth')
+def auth():
+
+    auth_token = request.args['code']
+    code_payload = {
+        "grant_type": "authorization_code",
+        "code": str(auth_token),
+        "redirect_uri": app.config['REDIRECT_URI']+url_for('auth')
+    }
+    bstring = six.text_type("{}:{}".format(app.config['CLIENT_ID'], app.config['CLIENT_SECRET']))
+    base64encoded = base64.b64encode(bstring.encode('ascii'))
+    headers = {"Authorization": "Basic {}".format(base64encoded.decode('ascii'))}
+    post_request = requests.post("https://accounts.spotify.com/api/token", data=code_payload, headers=headers)
+
+    response_data = json.loads(post_request.text)
+    access_token = response_data["access_token"]
+    session['spotify-token'] = access_token
+
+    return redirect(url_for('home'))
 
 @app.route('/_adjust_elo')
 def adjust_elo():

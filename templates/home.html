@@ -20,9 +20,14 @@ display: block;
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit" onclick="loading();">Search</button>
             </form>
             <p></p>
-            <!-- {% if artlist %}
-                <p>Try <a href="/voting/{{artlist[0].artistid}}" onclick="loading();">{{artlist[0].name}}</a>, <a href="/voting/{{artlist[1].artistid}}" onclick="loading();">{{artlist[1].name}}</a> or <a href="/voting/{{artlist[2].artistid}}" onclick="loading();">{{artlist[2].name}}</a></p> 
-            {% endif %} -->
+            {% if artlist %}
+                <p>Try some of your top Spotify artists:</p>
+                <ul style="list-style-type: none;"> 
+                    {% for artist in artlist %}
+                    <li><a href="/search?artist={{ artist['name'] }}" onclick="loading();">{{artist['name']}}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 </div>
 {% endblock %}
 

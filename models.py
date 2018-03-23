@@ -45,33 +45,35 @@ class Artist(db.Model):
                 if 'disambiguation' not in rel.keys() and \
                    all(k in rel.keys() for k in ['country','date','status']) and \
                    rel['status'] == 'Official':
-                    if rel['country'] in ['US','GB','XW','XE']:
+                    if rel['country'] in ['US','GB','XE']:
                         us.append(rel)
 
             us.sort(key=lambda x: x['date'])
 
             nalbums = len(albums)
             for rel in us:
-                album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings'])['release']
-                if 'format' in album['medium-list'][0].keys() and \
-                   album['cover-art-archive']['artwork'] == 'true':
-                    if album['medium-list'][0]['format'] == 'Digital Media':
-                        albums.append(album)
-                        break
-                    elif album['medium-list'][0]['format'] == 'CD':
-                        albums.append(album)
-                        break
-            
-            if len(albums) == nalbums:
-                for rel in us:
-                    album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings'])['release']
-                    if 'format' in album['medium-list'][0].keys():
+                album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings','artists'])['release']
+                if len(album['artist-credit']) == 1:
+                    if 'format' in album['medium-list'][0].keys() and \
+                    album['cover-art-archive']['artwork'] == 'true':
                         if album['medium-list'][0]['format'] == 'Digital Media':
                             albums.append(album)
                             break
                         elif album['medium-list'][0]['format'] == 'CD':
                             albums.append(album)
                             break
+            
+            if len(albums) == nalbums:
+                for rel in us:
+                    album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings','artists'])['release']
+                    if len(album['artist-credit']) == 1:
+                        if 'format' in album['medium-list'][0].keys():
+                            if album['medium-list'][0]['format'] == 'Digital Media':
+                                albums.append(album)
+                                break
+                            elif album['medium-list'][0]['format'] == 'CD':
+                                albums.append(album)
+                                break
 
         self.albums = [Album(album,self.name) for album in albums]
 
