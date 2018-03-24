@@ -131,10 +131,9 @@ class Track(db.Model):
     albumid = db.Column(db.Integer(), db.ForeignKey('albums.id'))
     elo = db.Column(db.Integer())
 
-    def __init__(self,name,artist,no):
+    def __init__(self,name,artist):
         self.name = name
         self.artist = artist
-        self.no = no
         self.elo = 1000
     def __repr__(self):
         return self.name
