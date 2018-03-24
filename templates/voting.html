@@ -9,7 +9,6 @@ a:hover img {
 }
 img.card-img-top {
     padding: 5px;
-    min-width: 200px;
     max-width: 300px;
 }
 .bs-docs-section {
@@ -23,6 +22,16 @@ img.card-img-top {
     bottom: 0;
     right: 0;
 }
+#rankingButton {
+    position: fixed;
+    left: 49%;
+    transform: translate(-100%, 0);
+    -webkit-transform: translate(-100%, 0);
+}
+#updateButton {
+    position: fixed;
+    left: 51%;
+}
 </style>
 {% endblock %}
 
@@ -32,8 +41,7 @@ img.card-img-top {
 <div id="content" class="container">
     <div class="page-header" id="banner">
         <div class="row">
-            <div class="col-lg-2"></div>
-            <div class="col-lg-8" style="text-align: center;">
+            <div class="col-lg-12" style="text-align: center;">
                 <h1>{{ artist.name }}</h1>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -45,12 +53,14 @@ img.card-img-top {
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <p class="lead"><a href="/ranking/{{ artist.artistid }}">Current Rankings</a></p>
+                <div id="rankingButton">
+                    <a href="/ranking/{{ artist.artistid }}" title="Current Rankings">Ranking <i class="fas fa-chart-line fa-fw"></i></a>
+                </div>
+                <div id="updateButton">
+                    <a href='/update/{{ artist.artistid }}' title="Update Artist" onclick="loading();">Update <i class="fas fa-retweet"></i></a>
+                </div>
+                <p></p>
             </div>
-            <div class="col-lg-1">
-                <h1><a href='/update/{{ artist.artistid }}' class="btn btn-outline-info" onclick="loading();">Update Artist</a></h1>
-            </div>
-            <div class="col-lg-1"></div>
         </div>
     </div>
     <div class="bs-docs-section clearfix">
