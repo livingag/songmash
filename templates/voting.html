@@ -22,16 +22,7 @@ img.card-img-top {
     bottom: 0;
     right: 0;
 }
-#rankingButton {
-    position: fixed;
-    left: 49%;
-    transform: translate(-100%, 0);
-    -webkit-transform: translate(-100%, 0);
-}
-#updateButton {
-    position: fixed;
-    left: 51%;
-}
+
 </style>
 {% endblock %}
 
@@ -54,12 +45,12 @@ img.card-img-top {
                     {% endif %}
                 {% endwith %}
                 <div id="rankingButton">
-                    <a href="/ranking/{{ artist.artistid }}" title="Current Rankings">Ranking <i class="fas fa-chart-line fa-fw"></i></a>
-                </div>
-                <div id="updateButton">
+                    <a href="/ranking/{{ artist.artistid }}" title="Current Rankings">Ranking <i class="fas fa-chart-line fa-fw"></i></a> &nbsp;
                     <a href='/update/{{ artist.artistid }}' title="Update Artist" onclick="loading();">Update <i class="fas fa-retweet"></i></a>
                 </div>
-                <p></p>
+                <div id="updateButton">
+
+                </div>
             </div>
         </div>
     </div>
