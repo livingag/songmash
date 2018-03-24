@@ -112,21 +112,28 @@ def update_artist(artistid):
     newartist = Artist(artistid)
     oldartist = Artist.query.filter_by(artistid=artistid).first()
 
-    oldalbums = [a.name for a in oldartist.albums]
-    newalbums = []
-    for album in newartist.albums:
-        if album.name not in oldalbums:
-            newalbums.append(album)
-        else:
-            ind = oldalbums.index(album.name)
-            oldalbum = oldartist.albums[ind]
-            oldtracks = [t.name for t in oldalbum.tracks]
-            newtracks = []
+    for album in oldartist.albums:
+        if album.name not in [a.name for a in newartist.albums]:
             for track in album.tracks:
-                if track.name not in oldtracks:
-                    newtracks.append(track)
-            oldalbum.tracks.extend(newtracks)   
-    oldartist.albums.extend(newalbums)
+                db.session.delete(track)
+            db.session.delete(album)
+        else:
+            ind = [a.name for a in newartist.albums].index(album.name)
+            newalbum = newartist.albums[ind]
+            for track in album.tracks:
+                if track.name not in [t.name for t in newalbum.tracks]:
+                    db.session.delete(track)
+
+    for album in newartist.albums:
+        if album.name not in [a.name for a in oldartist.albums]:
+            oldartist.albums.insert(newartist.albums.index(album),album)
+        else:
+            ind = [a.name for a in oldartist.albums].index(album.name)
+            oldalbum = oldartist.albums[ind]
+            for track in album.tracks:
+                if track.name not in [t.name for t in oldalbum.tracks]:
+                    newtrack = Track(track.name,track.artist)
+                    oldalbum.tracks.insert(album.tracks.index(track),newtrack) 
 
     db.session.commit()
 

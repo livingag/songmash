@@ -7,15 +7,21 @@ a:hover img {
     border: none !important;
     display: block;
 }
-img {
+img.card-img-top {
     padding: 5px;
-    width: 200px;
+    min-width: 200px;
+    max-width: 300px;
 }
 .bs-docs-section {
     margin-top: 2vh;
 }
 .animated {
     animation-duration: 1.5s;
+}
+.spotifyLink {
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
 </style>
 {% endblock %}
@@ -48,10 +54,14 @@ img {
         </div>
     </div>
     <div class="bs-docs-section clearfix">
-        <div class="row" style="min-height: 530px;">
+        <div class="row" style="min-height: 450px;">
             <div id="trackcol" class="col animated fadeInLeftBig" align="center">
                 <div id="track1card" class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <a href="#"><img class="card-img-top" id=track1 src="{{ track1.album.art }}"></a>
+                    {% if track1.album.art != None %}
+                        <a href="#"><img class="card-img-top" id=track1 src="{{ track1.album.art }}"></a>
+                    {% else %}
+                        <a href="#"><img class="card-img-top" id=track1 src="{{ url_for('static', filename='img/noart.png') }}"></a>
+                    {% endif %}
                     <div class="card-body">
                         <p class="card-text" style="text-align: center;">{{ track1.name }}</p>
                     </div>
@@ -59,25 +69,25 @@ img {
                         <p class="card-text" style="text-align: center;">{{ track1.album }}</p>
                     </div>
                     {% if 'spotify-token' in session and track1.spid %}
-                    <div class="card-footer">
-                        <iframe src="https://open.spotify.com/embed?uri=spotify:track:{{ track1.spid }}" width="250" height="80" frameborder="0" allow="encrypted-media" allowtransparency="true"></iframe>
-                    </div>
+                        <div class="spotifyLink"><a href="https://open.spotify.com/track/{{ track1.spid }}" target="_blank"><img src="https://www.shareicon.net/download/128x128//2016/08/01/639870_internet_512x512.png" width="20" height="20"></a></div>
                     {% endif %}
                 </div>
             </div>
             <div class="col animated fadeInRightBig pulse" align="center">
                 <div id="track2card" class="card" style="max-width: 300px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <a href="#"><img class="card-img-top" id=track2 src="{{ track2.album.art }}"></a>
+                    {% if track2.album.art != None %}
+                        <a href="#"><img class="card-img-top" id=track2 src="{{ track2.album.art }}"></a>
+                    {% else %}
+                        <a href="#"><img class="card-img-top" id=track2 src="{{ url_for('static', filename='img/noart.png') }}"></a>
+                    {% endif %}
                     <div class="card-body">
                         <p class="card-text" style="text-align: center;">{{ track2.name }}</p>
                     </div>
                     <div class="card-footer text-muted">
                         <p class="card-text" style="text-align: center;">{{ track2.album }}</p>
                     </div>
-                    {% if 'spotify-token' in session  and track2.spid %}
-                    <div class="card-footer">
-                        <iframe src="https://open.spotify.com/embed?uri=spotify:track:{{ track2.spid }}" width="250" height="80" frameborder="0" allow="encrypted-media" allowtransparency="true"></iframe>
-                    </div>
+                    {% if 'spotify-token' in session and track2.spid %}
+                        <div class="spotifyLink"><a href="https://open.spotify.com/track/{{ track2.spid }}" target="_blank"><img src="https://www.shareicon.net/download/128x128//2016/08/01/639870_internet_512x512.png" width="20" height="20"></a></div>
                     {% endif %}
                 </div>
             </div>

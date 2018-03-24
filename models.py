@@ -45,7 +45,7 @@ class Artist(db.Model):
                 if 'disambiguation' not in rel.keys() and \
                    all(k in rel.keys() for k in ['country','date','status']) and \
                    rel['status'] == 'Official':
-                    if rel['country'] in ['US','GB','XE']:
+                    if rel['country'] in ['US','GB','XE','XW','AU']:
                         us.append(rel)
 
             us.sort(key=lambda x: x['date'])
@@ -109,7 +109,7 @@ class Album(db.Model):
                 soup = BeautifulSoup(r.text,"lxml")
                 self.art = soup.find('img', {'alt': album['title']})['src']
             except:
-                self.art = "{{ url_for('static', filename='img/noart.png') }}"
+                self.art = None
         elif art.status_code == 502:
             time.sleep(0.5)
             art = requests.get('http://coverartarchive.org/release/{}'.format(album['id']))
@@ -131,9 +131,10 @@ class Track(db.Model):
     albumid = db.Column(db.Integer(), db.ForeignKey('albums.id'))
     elo = db.Column(db.Integer())
 
-    def __init__(self,name,artist):
+    def __init__(self,name,artist,no):
         self.name = name
         self.artist = artist
+        self.no = no
         self.elo = 1000
     def __repr__(self):
         return self.name
