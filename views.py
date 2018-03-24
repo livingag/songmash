@@ -15,10 +15,13 @@ import six
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    if 'spotify-token' in session:        
-        token = session['spotify-token']
-        sp = spotipy.Spotify(auth=token)
-        topartists = sp.current_user_top_artists(time_range='long_term', limit=10)
+    if 'spotify-token' in session:
+        try:        
+            token = session['spotify-token']
+            sp = spotipy.Spotify(auth=token)
+            topartists = sp.current_user_top_artists(time_range='long_term', limit=10)
+        except:
+            return redirect(url_for('logout_spotify'))
 
         return render_template('home.html',artlist=topartists['items'])
     else:
@@ -112,21 +115,26 @@ def update_artist(artistid):
     newartist = Artist(artistid)
     oldartist = Artist.query.filter_by(artistid=artistid).first()
 
+    updated = False
+    
     for album in oldartist.albums:
         if album.name not in [a.name for a in newartist.albums]:
             for track in album.tracks:
                 db.session.delete(track)
             db.session.delete(album)
+            updated = True
         else:
             ind = [a.name for a in newartist.albums].index(album.name)
             newalbum = newartist.albums[ind]
             for track in album.tracks:
                 if track.name not in [t.name for t in newalbum.tracks]:
                     db.session.delete(track)
+                    updated = True
 
     for album in newartist.albums:
         if album.name not in [a.name for a in oldartist.albums]:
             oldartist.albums.insert(newartist.albums.index(album),album)
+            updated = True
         else:
             ind = [a.name for a in oldartist.albums].index(album.name)
             oldalbum = oldartist.albums[ind]
@@ -134,10 +142,11 @@ def update_artist(artistid):
                 if track.name not in [t.name for t in oldalbum.tracks]:
                     newtrack = Track(track.name,track.artist)
                     oldalbum.tracks.insert(album.tracks.index(track),newtrack) 
+                    updated = True
 
     db.session.commit()
 
-    if len(newalbums) > 0 or len(newtracks) > 0:
+    if updated == True:
         flash('Artist successfully updated!','success')
     else:
         flash('Artist already up to date!','info')

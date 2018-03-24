@@ -69,7 +69,7 @@ img.card-img-top {
                         <p class="card-text" style="text-align: center;">{{ track1.album }}</p>
                     </div>
                     {% if 'spotify-token' in session and track1.spid %}
-                        <div class="spotifyLink"><a href="https://open.spotify.com/track/{{ track1.spid }}" target="_blank"><img src="https://www.shareicon.net/download/128x128//2016/08/01/639870_internet_512x512.png" width="20" height="20"></a></div>
+                        <div class="spotifyLink"><a href="https://open.spotify.com/track/{{ track1.spid }}" target="_blank"><img src="{{ url_for('static', filename='img/spotifyicon.png') }}" width="20" height="20"></a></div>
                     {% endif %}
                 </div>
             </div>
@@ -87,7 +87,7 @@ img.card-img-top {
                         <p class="card-text" style="text-align: center;">{{ track2.album }}</p>
                     </div>
                     {% if 'spotify-token' in session and track2.spid %}
-                        <div class="spotifyLink"><a href="https://open.spotify.com/track/{{ track2.spid }}" target="_blank"><img src="https://www.shareicon.net/download/128x128//2016/08/01/639870_internet_512x512.png" width="20" height="20"></a></div>
+                        <div class="spotifyLink"><a href="https://open.spotify.com/track/{{ track2.spid }}" target="_blank"><img src="{{ url_for('static', filename='img/spotifyicon.png') }}" width="20" height="20"></a></div>
                     {% endif %}
                 </div>
             </div>
