@@ -62,7 +62,7 @@ class Artist(db.Model):
                         elif album['medium-list'][0]['format'] == 'CD':
                             albums.append(album)
                             break
-            
+
             if len(albums) == nalbums:
                 for rel in us:
                     album = musicbrainzngs.get_release_by_id(rel['id'],includes=['recordings','artists'])['release']

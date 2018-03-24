@@ -16,7 +16,7 @@ import six
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if 'spotify-token' in session:
-        try:        
+        try:
             token = session['spotify-token']
             sp = spotipy.Spotify(auth=token)
             topartists = sp.current_user_top_artists(time_range='long_term', limit=10)
@@ -40,7 +40,7 @@ def search():
         name = request.form['artist']
     else:
         name = request.args.get('artist')
-    
+
     if Artist.query.filter(Artist.name.ilike(name)).first():
         artist = Artist.query.filter(Artist.name.ilike(name)).first()
         return redirect(url_for('voting',artistid=artist.artistid))
@@ -64,7 +64,7 @@ def new_artist(artist):
 @app.route('/voting/<string:artistid>')
 def voting(artistid):
 
-    
+
     artist = get_artist(artistid)
 
     tracks = []
@@ -74,7 +74,7 @@ def voting(artistid):
 
     vs = random.sample(tracks,2)
 
-    if 'spotify-token' in session: 
+    if 'spotify-token' in session:
         token = session['spotify-token']
         sp = spotipy.Spotify(auth=token)
         for v in vs:
@@ -116,7 +116,7 @@ def update_artist(artistid):
     oldartist = Artist.query.filter_by(artistid=artistid).first()
 
     updated = False
-    
+
     for album in oldartist.albums:
         if album.name not in [a.name for a in newartist.albums]:
             for track in album.tracks:
@@ -141,7 +141,7 @@ def update_artist(artistid):
             for track in album.tracks:
                 if track.name not in [t.name for t in oldalbum.tracks]:
                     newtrack = Track(track.name,track.artist)
-                    oldalbum.tracks.insert(album.tracks.index(track),newtrack) 
+                    oldalbum.tracks.insert(album.tracks.index(track),newtrack)
                     updated = True
 
     db.session.commit()
@@ -150,7 +150,7 @@ def update_artist(artistid):
         flash('Artist successfully updated!','success')
     else:
         flash('Artist already up to date!','info')
-    
+
     return redirect(url_for('voting',artistid=oldartist.artistid))
 
 
