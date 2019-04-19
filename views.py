@@ -194,23 +194,27 @@ def auth():
 
     return redirect(url_for('home'))
 
-@app.route('/_adjust_elo')
+@app.route('/_adjust_elo', methods=['GET','POST'])
 def adjust_elo():
-    winner = request.args.get('winner', 0, type=int)
-    loser = request.args.get('loser', 0, type=int)
+    if request.method == 'POST':
+        data = request.get_json()
+        winner = data['winner']
+        loser = data['loser']
 
-    winner = Track.query.filter_by(id=winner).first()
-    loser = Track.query.filter_by(id=loser).first()
+        winner = Track.query.filter_by(id=winner).first()
+        loser = Track.query.filter_by(id=loser).first()
 
-    winner.adjust_elo_win(loser)
+        winner.adjust_elo_win(loser)
 
-    db.session.add(winner)
-    db.session.add(loser)
-    db.session.commit()
+        db.session.add(winner)
+        db.session.add(loser)
+        db.session.commit()
 
-    end = 1
+        end = 1
 
-    return jsonify(end=end)
+        return jsonify(end=end)
+    else:
+        return redirect(url_for('home'))
 
 
 @app.route('/_get_plot_data')

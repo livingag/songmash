@@ -16,13 +16,14 @@ display: block;
             <h1 class="cover-heading">Crowdsourced discography rankings.</h1>
             <p class="lead">Vote between random tracks of an artist's discography and see which track comes out on top.</p>
             <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input class="form-control mr-sm-2" name="artist" type="text" placeholder="Artist Name..." style="width: 250px;">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit" onclick="loading();">Search</button>
             </form>
             <p></p>
             {% if artlist %}
                 <p>Try some of your top Spotify artists:</p>
-                <ul style="list-style-type: none;"> 
+                <ul style="list-style-type: none;">
                     {% for artist in artlist %}
                     <li><a href="/search?artist={{ artist['name'] }}" onclick="loading();">{{artist['name']}}</a></li>
                     {% endfor %}

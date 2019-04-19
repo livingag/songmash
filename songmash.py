@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 import os
 import musicbrainzngs
 
+csrf = CSRFProtect()
+
 app = Flask(__name__)
+csrf.init_app(app)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
