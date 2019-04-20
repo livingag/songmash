@@ -8,8 +8,8 @@ from bs4 import BeautifulSoup
 class Artist(db.Model):
     __tablename__ = 'artists'
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(40))
-    artistid = db.Column(db.String(40))
+    name = db.Column(db.String(100))
+    artistid = db.Column(db.String(100))
     albums = db.relationship('Album')
 
     def __init__(self,artistid):
@@ -25,27 +25,29 @@ class Artist(db.Model):
         releasegroups = artist['release-group-list']
 
         albums = []
-        releases = []
+        releasegrps = []
         for release in releasegroups:
             if release['type'] == 'Album' and \
-               all(k not in release.keys() for k in ['disambiguation','secondary-type-list']):
-                releases.append(release)
-        releases.sort(key=lambda x: x['first-release-date'])
-        albumids = [release['id'] for release in releases]
+               all(k not in release.keys() for k in ['disambiguation','secondary-type-list']) and \
+                   len(release['first-release-date']) > 4:
+                releasegrps.append(release)
+        releasegrps.sort(key=lambda x: x['first-release-date'])
+        albumids = [release['id'] for release in releasegrps]
 
         if len(albumids) <= 1:
             raise ValueError()
 
-        for albumid in albumids:
+        for i, albumid in enumerate(albumids):
 
-            releases = musicbrainzngs.get_release_group_by_id(albumid,includes=["releases"])['release-group']['release-list']
+            releases = musicbrainzngs.get_release_group_by_id(albumid,includes=["releases",'media'])['release-group']['release-list']
+            releases = [rel for rel in releases if 'date' in rel.keys()]
+            releases.sort(key=lambda x: x['date'])
 
             us = []
             for rel in releases:
-                if 'disambiguation' not in rel.keys() and \
-                   all(k in rel.keys() for k in ['country','date','status']) and \
+                if all(k in rel.keys() for k in ['country','date','status']) and \
                    rel['status'] == 'Official':
-                    if rel['country'] in ['US','GB','XE','XW','AU']:
+                    if rel['country'] in ['US','GB','XE','XW','AU'] and rel['title'] == releasegrps[i]['title']:
                         us.append(rel)
 
             us.sort(key=lambda x: x['date'])
@@ -82,8 +84,8 @@ class Album(db.Model):
     __tablename__ = 'albums'
     id = db.Column(db.Integer(), primary_key=True)
     artistid = db.Column(db.Integer(), db.ForeignKey('artists.id'))
-    name = db.Column(db.String(40))
-    title = db.Column(db.String(40))
+    name = db.Column(db.String(100))
+    title = db.Column(db.String(100))
     art = db.Column(db.String(200))
     tracks = db.relationship('Track', backref='album', lazy=True)
 
@@ -127,7 +129,7 @@ class Album(db.Model):
 class Track(db.Model):
     __tablename__ = 'tracks'
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(40))
+    name = db.Column(db.String(100))
     albumid = db.Column(db.Integer(), db.ForeignKey('albums.id'))
     elo = db.Column(db.Integer())
 
