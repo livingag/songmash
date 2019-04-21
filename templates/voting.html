@@ -175,20 +175,32 @@ img.card-img-top {
     });
     $(document).keyup(function(e) {
         if (e.which == 37) {
-            $.getJSON($SCRIPT_ROOT + '/_adjust_elo', {
-                winner: {{ track1.id }},
-                loser : {{ track2.id }},
-            }, function(data) {
-                location.reload();
-            });
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('adjust_elo') }}",
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({'winner': {{ track1.id }}, 'loser': {{ track2.id }}}),
+                success: function (data) {
+                    $('#track2card').addClass('animated fadeOutRight');
+                    $('#track1card').animateCss('pulse', function () {
+                        location.reload();
+                    });
+                }
+            })
         }
         if (e.which == 39) {
-            $.getJSON($SCRIPT_ROOT + '/_adjust_elo', {
-                winner: {{ track2.id }},
-                loser : {{ track1.id }},
-            }, function(data) {
-                location.reload();
-            });
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('adjust_elo') }}",
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({'winner': {{ track2.id }}, 'loser': {{ track1.id }}}),
+                success: function (data) {
+                    $('#track1card').addClass('animated fadeOutLeft');
+                    $('#track2card').animateCss('pulse', function () {
+                        location.reload();
+                    });
+                }
+            })
         }
         if (e.which == 40) {
             location.reload();
