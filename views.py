@@ -10,6 +10,7 @@ from spotipy import oauth2
 import base64
 import json
 import six
+from itertools import cycle
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -241,16 +242,38 @@ def get_plot_data():
 
     artist = get_artist(artist)
 
+    colors = [
+        "#4878CF",
+        "#EE854A",
+        "#6ACC64",
+        "#D65F5F",
+        "#B47CC7",
+        "#C4AD66",
+        "#77BEDB",
+    ]
+
+    colorcycle = cycle(colors)
+
     data = []
     no = 1
     tracknames = []
     for album in artist.albums:
+        color = next(colorcycle)
         trackdata = []
         for track in album.tracks:
-            trackdata.append([no, track.elo])
+            trackdata.append({"x": no, "y": track.elo})
             tracknames.append(track.name)
             no += 1
-        data.append({"label": album.name, "data": trackdata})
+        data.append(
+            {
+                "label": album.name,
+                "borderColor": color,
+                "backgroundColor": color,
+                "showLine": False,
+                "pointRadius": 3,
+                "data": trackdata,
+            }
+        )
     data = [data, tracknames]
     return jsonify(data)
 

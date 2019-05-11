@@ -2,6 +2,7 @@
 
 {% block head %}
 <title>songmash - {{ artist.name }}</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
 <style>
 img {
     border: 1px solid #ddd;
@@ -11,6 +12,13 @@ img {
 }
 .bs-docs-section {
     margin-top: 4em;
+}
+.table tr th {
+    border-bottom: 1px solid #404040;
+    border-top: 0px
+}
+.table tr td {
+    border-bottom: 1px solid #404040
 }
 </style>
 {% endblock %}
@@ -32,21 +40,17 @@ img {
     </div>
     <div class="bs-docs-section clearfix">
         <div class="row" style="margin-bottom: 2vh;">
-            <div class="col-lg-10">
-                <div class="card" style=" box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <div id="placeholder" style="padding: 10px; min-height:20vh;"></div>
-                </div>
-            </div>
-            <div class="col-lg-2">
-                <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <div id="legend-container" style="padding:10px;"></div>
+            <div class="col-lg-12">
+                <div style="height: 7cm;">
+                    <canvas id="canvas"></canvas>
+                    <!-- <div id="placeholder" style="padding: 10px; min-height:20vh;"></div> -->
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-6" align="center">
-                <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                    <table class="table table-hover">
+                <div style="color: #f5f5f5">
+                    <table class="table">
                         <thead>
                             <th scope="col">Rank</th>
                             <th scope="col">Song</th>
@@ -65,7 +69,7 @@ img {
                 </div>
             </div>
             <div class="col-lg-6" align="center">
-                <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                <div style="color: #f5f5f5">
                     <table class="table table-hover">
                         <thead>
                             <th scope="col">Rank</th>
@@ -98,50 +102,72 @@ img {
 </script>
 <script type="text/javascript">
     $(document).ready(function(){
-        $("<div id='tooltip'></div>").css({
-			position: "absolute",
-			display: "none",
-			border: "1px solid #fdd",
-			padding: "2px",
-			"background-color": "#fee",
-			opacity: 0.80
-		}).appendTo("body");
+        Chart.defaults.global.defaultFontColor='#f5f5f5';
+        var ctx = document.getElementById('canvas').getContext('2d');
         $.getJSON($SCRIPT_ROOT + '/_get_plot_data', {
                 artist: "{{ artist.artistid }}"
-            }, function(data) {
-		var placeholder = $('#placeholder');
-                var plot = $.plot('#placeholder',data[0],{
-                    xaxis: {
-                        min: 0,
-                        ticks: []
+            }, function(plotdata) {
+                window.myScatter = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: plotdata[0]
                     },
-                    yaxis: {
-                        title: 'Elo'
-                    },
-                    series: {
-                        lines: { show: false },
-                        points: { show: true },
-                    },
-                    legend: {
-                        container: $("#legend-container")
-                    },
-                    grid: {
-                        hoverable: true
+                    options: {
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 0
+                        },
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 10
+                            }
+                        },
+                        tooltips: {
+                            custom: function(tooltip) {
+                                if (!tooltip) return;
+                                tooltip.displayColors = false;
+                            },
+                            callbacks: {
+                                afterLabel: function(tooltipItem, data) {
+                                    var y = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y
+                                    return 'Elo: '+Math.round(y)
+                                },
+                                label: function(tooltipItem, data) {
+                                    var x = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].x
+                                    return plotdata[1][x-1]
+                                },
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                gridLines: {
+                                    display: false,
+                                },
+                                scaleLabel: {
+                                    display: false
+                                },
+                                ticks: {
+                                    display: false
+                                }
+                            }],
+                            yAxes: [{
+                                gridLines: {
+                                    color: '#404040',
+                                    zeroLineColor: '#404040',
+                                    drawBorder: false
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Rating'
+                                }
+                            }]
+                        }
                     }
                 });
-		$('#placeholder').height($('#legend-container').outerHeight());
-        $("#placeholder").bind("plothover", function (event, pos, item){
-            if (item) {
-                $("#tooltip").html(data[1][item.datapoint[0]-1])
-                    .css({top: item.pageY-30, left: item.pageX+5, "background-color": item.series.color})
-                    .fadeIn(200);
-            } else {
-                $("#tooltip").hide();
-            }
-        });
 
     });
-        
+
     })
 </script>
 {% endblock %}
