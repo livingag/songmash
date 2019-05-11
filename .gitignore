@@ -1,5 +1,5 @@
 __pycache__/
 app.db
-config.py
+spotify.cfg
 env
 .vscode
