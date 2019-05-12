@@ -1,5 +1,5 @@
 from flask import render_template, request, url_for, jsonify, redirect, flash, session
-from songmash import app, db
+from songmash import app, db, csrf
 from utils import get_artist
 from models import *
 import random
