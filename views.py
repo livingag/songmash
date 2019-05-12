@@ -279,6 +279,7 @@ def get_plot_data():
 
 
 @app.route("/webhook", methods=["POST"])
+@csrf.exempt
 def webhook():
     import git
     from pathlib import Path
