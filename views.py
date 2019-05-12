@@ -277,3 +277,20 @@ def get_plot_data():
     data = [data, tracknames]
     return jsonify(data)
 
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    import git
+    from pathlib import Path
+
+    if request.method == "POST":
+        repo = git.Repo(".")
+        origin = repo.remotes.origin
+        repo.create_head("master", origin.refs.master).set_tracking_branch(
+            origin.refs.master
+        ).checkout()
+        origin.pull()
+        Path("/var/www/songmash_livingag_com_wsgi.py").touch()
+        return "", 200
+    else:
+        return "", 400
