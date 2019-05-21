@@ -10,7 +10,7 @@ class Artist(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
     artistid = db.Column(db.String(100))
-    albums = db.relationship("Album")
+    albums = db.relationship("Album", cascade="all, delete")
 
     def __init__(self, artistid):
         artist = musicbrainzngs.get_artist_by_id(
@@ -70,12 +70,11 @@ class Artist(db.Model):
                 if len(album["artist-credit"]) == 1:
                     if (
                         "format" in album["medium-list"][0].keys()
+                        and "disambiguation" not in album.keys()
                         and album["cover-art-archive"]["artwork"] == "true"
+                        and len(album["date"]) > 4
                     ):
-                        if album["medium-list"][0]["format"] == "Digital Media":
-                            albums.append(album)
-                            break
-                        elif album["medium-list"][0]["format"] == "CD":
+                        if album["medium-list"][0]["format"] in ["Digital Media", "CD"]:
                             albums.append(album)
                             break
 
@@ -86,10 +85,10 @@ class Artist(db.Model):
                     )["release"]
                     if len(album["artist-credit"]) == 1:
                         if "format" in album["medium-list"][0].keys():
-                            if album["medium-list"][0]["format"] == "Digital Media":
-                                albums.append(album)
-                                break
-                            elif album["medium-list"][0]["format"] == "CD":
+                            if album["medium-list"][0]["format"] in [
+                                "Digital Media",
+                                "CD",
+                            ]:
                                 albums.append(album)
                                 break
 
@@ -103,7 +102,7 @@ class Album(db.Model):
     name = db.Column(db.String(100))
     title = db.Column(db.String(100))
     art = db.Column(db.String(200))
-    tracks = db.relationship("Track", backref="album", lazy=True)
+    tracks = db.relationship("Track", backref="album", lazy=True, cascade="all, delete")
 
     def __init__(self, album, artist):
         self.artist = artist
@@ -111,8 +110,9 @@ class Album(db.Model):
         self.get_album_art(album)
         self.tracks = []
         for disc in album["medium-list"]:
-            for track in disc["track-list"]:
-                self.tracks.append(Track(track["recording"]["title"], self.artist))
+            if disc["format"] in ["CD", "Digital Media"]:
+                for track in disc["track-list"]:
+                    self.tracks.append(Track(track["recording"]["title"], self.artist))
 
     def __repr__(self):
         return self.name
