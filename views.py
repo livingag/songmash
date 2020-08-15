@@ -2,14 +2,9 @@ from flask import render_template, request, url_for, jsonify, redirect, flash, s
 from songmash import app, db, csrf
 from utils import get_artist
 from models import *
-import random
+import random, urllib, spotipy, base64, json, six, hmac, hashlib
 from profanity import profanity
-import urllib
-import spotipy
 from spotipy import oauth2
-import base64
-import json
-import six
 from itertools import cycle
 
 
@@ -285,13 +280,24 @@ def webhook():
     from pathlib import Path
 
     if request.method == "POST":
-        repo = git.Repo(".")
-        origin = repo.remotes.origin
-        repo.create_head("master", origin.refs.master).set_tracking_branch(
-            origin.refs.master
-        ).checkout()
-        origin.pull()
-        Path("/var/www/songmash_livingag_com_wsgi.py").touch()
-        return "", 200
+        signature = request.headers.get("X-Hub-Signature")
+        if not signature or not signature.startswith("sha1="):
+            return "", 400
+
+        digest = hmac.new(
+            app.config["GITHUB_SECRET"].encode(), request.data, hashlib.sha1
+        ).hexdigest()
+
+        if hmac.compare_digest(signature, "sha1=" + digest):
+            repo = git.Repo(".")
+            origin = repo.remotes.origin
+            repo.create_head("master", origin.refs.master).set_tracking_branch(
+                origin.refs.master
+            ).checkout()
+            origin.pull()
+            Path("/var/www/tvtrend_livingag_com_wsgi.py").touch()
+            return "", 200
+        else:
+            return "", 400
     else:
         return "", 400
