@@ -103,6 +103,7 @@ img {
 <script type="text/javascript">
     $(document).ready(function(){
         Chart.defaults.global.defaultFontColor='#f5f5f5';
+        Chart.defaults.global.defaultFontFamily = 'IBM Plex Sans';
         var ctx = document.getElementById('canvas').getContext('2d');
         $.getJSON($SCRIPT_ROOT + '/_get_plot_data', {
                 artist: "{{ artist.artistid }}"
